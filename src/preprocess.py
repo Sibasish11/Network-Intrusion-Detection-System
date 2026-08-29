@@ -11,12 +11,6 @@ import os
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-# ---------------------------------------------------------------------
-# STEP A: Column names
-# The raw .txt files have NO header row, so we define the 43 columns
-# ourselves. 41 are traffic features, 1 is the attack label, 1 is a
-# "difficulty" score we won't use.
-# ---------------------------------------------------------------------
 COLUMN_NAMES = [
     "duration", "protocol_type", "service", "flag", "src_bytes", "dst_bytes",
     "land", "wrong_fragment", "urgent", "hot", "num_failed_logins",
