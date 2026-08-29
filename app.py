@@ -90,11 +90,6 @@ def get_ai_explanation(features, true_label, predictions):
     return local_ai_explanation(features, true_label, predictions)
 
 
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-
 @app.route("/api/random_sample")
 def random_sample():
     idx = random.randint(0, len(X_test) - 1)
