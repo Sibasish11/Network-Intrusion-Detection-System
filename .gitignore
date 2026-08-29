@@ -1,0 +1,12 @@
+# Large datasets
+data/Data.csv
+
+# Large model artifacts
+models/test_data.joblib
+
+# Python cache
+__pycache__/
+*.pyc
+venv/
+.env
+assets/.gitkeep

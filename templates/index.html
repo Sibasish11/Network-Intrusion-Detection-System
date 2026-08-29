@@ -1,240 +1,2176 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>NIDS Console</title>
-<style>
-  :root {
-    --bg: #0b0f0d;
-    --panel: #101613;
-    --line: #1e2b25;
-    --text: #d7e5dd;
-    --dim: #6f8a7c;
-    --safe: #4fd897;
-    --danger: #ff6b5e;
-    --mono: 'Courier New', Consolas, monospace;
-  }
-  * { box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    margin: 0;
-    padding: 40px 24px;
-  }
-  .wrap { max-width: 900px; margin: 0 auto; }
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 16px;
-    margin-bottom: 28px;
-  }
-  h1 {
-    font-size: 20px;
-    letter-spacing: 2px;
-    margin: 0;
-    text-transform: uppercase;
-  }
-  h1 span { color: var(--safe); }
-  .sub { color: var(--dim); font-size: 12px; letter-spacing: 1px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIDS Console — AI Network Intrusion Detection System</title>
+  <link rel="icon" type="image/png" href="/static/nids_logo.png">
 
-  button {
-    background: transparent;
-    color: var(--safe);
-    border: 1px solid var(--safe);
-    padding: 10px 18px;
-    font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-transform: uppercase;
-  }
-  button:hover { background: var(--safe); color: #06110c; }
-  button:disabled { opacity: 0.4; cursor: default; }
+  <!-- Modern Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  .panel {
-    border: 1px solid var(--line);
-    background: var(--panel);
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .panel-title {
-    color: var(--dim);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 8px;
-  }
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px 24px;
-    font-size: 13px;
-  }
-  .feature-grid div span:first-child { color: var(--dim); }
-  .feature-grid div span:last-child { float: right; }
+  <!-- Marked.js for AI Markdown Formatting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  .truth-banner {
-    text-align: center;
-    padding: 14px;
-    font-size: 15px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    border: 1px solid var(--line);
-  }
-  .truth-banner.normal { color: var(--safe); border-color: var(--safe); }
-  .truth-banner.attack { color: var(--danger); border-color: var(--danger); }
+  <style>
+    :root {
+      --bg-darkest: #06090e;
+      --bg-dark: #0a0f16;
+      --bg-card: rgba(14, 21, 31, 0.75);
+      --bg-card-hover: rgba(19, 29, 44, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 240, 144, 0.25);
+      --border-danger: rgba(255, 51, 102, 0.35);
 
-  .model-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 13px;
-  }
-  .model-row:last-child { border-bottom: none; }
-  .model-name { color: var(--text); text-transform: uppercase; letter-spacing: 1px; }
-  .verdict { font-weight: bold; letter-spacing: 1px; }
-  .verdict.normal { color: var(--safe); }
-  .verdict.attack { color: var(--danger); }
-  .confidence { color: var(--dim); margin-left: 10px; font-size: 12px; }
-  .correct-tag { font-size: 11px; margin-left: 10px; }
-  .correct-tag.yes { color: var(--safe); }
-  .correct-tag.no { color: var(--danger); }
+      --text-main: #f1f5f9;
+      --text-muted: #8e9eb3;
+      --text-dim: #54657a;
 
-  .ai-panel {
-    border: 1px solid var(--line);
-    background: #131916;
-    padding: 18px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    line-height: 1.6;
-  }
-  .ai-title {
-    color: var(--dim);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
+      --accent-safe: #00f090;
+      --accent-safe-glow: rgba(0, 240, 144, 0.4);
+      --accent-safe-bg: rgba(0, 240, 144, 0.08);
 
-  .placeholder { color: var(--dim); text-align: center; padding: 30px 0; }
-  footer { color: var(--dim); font-size: 11px; text-align: center; margin-top: 30px; }
-</style>
+      --accent-danger: #ff3366;
+      --accent-danger-glow: rgba(255, 51, 102, 0.4);
+      --accent-danger-bg: rgba(255, 51, 102, 0.1);
+
+      --accent-cyan: #00e5ff;
+      --accent-cyan-bg: rgba(0, 229, 255, 0.08);
+
+      --accent-amber: #f59e0b;
+      --accent-amber-bg: rgba(245, 158, 11, 0.1);
+
+      --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-darkest);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(0, 229, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(255, 51, 102, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(0, 240, 144, 0.03) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-darkest);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-cyan);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* =====================================================================
+       HEADER
+       ===================================================================== */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand-logo-img {
+      height: 52px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
+      transition: transform 0.3s ease;
+    }
+
+    .brand-logo-img:hover {
+      transform: scale(1.04);
+    }
+
+    .brand-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-text .status-badge {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: var(--accent-safe-bg);
+      color: var(--accent-safe);
+      border: 1px solid rgba(0, 240, 144, 0.3);
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-safe);
+      box-shadow: 0 0 8px var(--accent-safe);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+
+      50% {
+        transform: scale(1.4);
+        opacity: 1;
+        filter: drop-shadow(0 0 6px var(--accent-safe));
+      }
+
+      100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .key-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--accent-cyan);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.08);
+    }
+
+    .key-btn:hover {
+      background: var(--accent-cyan-bg);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .key-btn.has-key {
+      border-color: var(--accent-safe);
+      color: var(--accent-safe);
+      box-shadow: 0 0 15px rgba(0, 240, 144, 0.15);
+    }
+
+    /* =====================================================================
+       NAVIGATION TABS
+       ===================================================================== */
+    .tab-bar {
+      display: flex;
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 6px;
+      margin-bottom: 24px;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 20px;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn i {
+      font-size: 15px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 240, 144, 0.15));
+      color: #ffffff;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 229, 255, 0.12);
+    }
+
+    /* =====================================================================
+       MAIN GRID LAYOUT
+       ===================================================================== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 1080px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title i {
+      color: var(--accent-cyan);
+    }
+
+    /* =====================================================================
+       PRESETS BAR
+       ===================================================================== */
+    .preset-section {
+      margin-bottom: 22px;
+    }
+
+    .preset-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .preset-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .preset-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .preset-card:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 229, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .preset-card.active {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 229, 255, 0.12);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+    }
+
+    .preset-card .preset-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .preset-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .preset-tag.normal {
+      background: var(--accent-safe-bg);
+      color: var(--accent-safe);
+    }
+
+    .preset-tag.attack {
+      background: var(--accent-danger-bg);
+      color: var(--accent-danger);
+    }
+
+    .preset-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* =====================================================================
+       MANUAL FORM CONTROLS
+       ===================================================================== */
+    .form-section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-cyan);
+      margin: 16px 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 640px) {
+
+      .form-grid-3,
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .form-group label span.val-badge {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .form-control {
+      background: rgba(9, 14, 23, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+    }
+
+    select.form-control {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.5l-5-5h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 28px;
+    }
+
+    /* Slider styling */
+    input[type=range].slider-control {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #1e293b;
+      outline: none;
+      margin: 8px 0;
+    }
+
+    input[type=range].slider-control::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-cyan);
+      transition: transform 0.1s ease;
+    }
+
+    input[type=range].slider-control::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    /* Accordion for advanced 40 features */
+    .advanced-accordion {
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      background: rgba(10, 16, 26, 0.5);
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    .accordion-header {
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: background 0.2s;
+    }
+
+    .accordion-header:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+    }
+
+    .accordion-content {
+      padding: 16px;
+      display: none;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(6, 10, 18, 0.6);
+    }
+
+    .accordion-content.open {
+      display: block;
+    }
+
+    /* Main Analyze Button */
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-analyze {
+      flex: 1;
+      background: linear-gradient(135deg, #00e5ff 0%, #00f090 100%);
+      color: #060e14;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 24px;
+      font-family: var(--font-ui);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 24px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-analyze:hover {
+      box-shadow: 0 6px 32px rgba(0, 240, 144, 0.5);
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .btn-analyze:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* =====================================================================
+       RIGHT COLUMN: VERDICT & TELEMETRY
+       ===================================================================== */
+    .verdict-banner {
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.7);
+      transition: all 0.3s ease;
+    }
+
+    .verdict-banner.attack {
+      background: linear-gradient(180deg, rgba(255, 51, 102, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border-color: var(--border-danger);
+      box-shadow: 0 0 35px rgba(255, 51, 102, 0.2);
+    }
+
+    .verdict-banner.normal {
+      background: linear-gradient(180deg, rgba(0, 240, 144, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border-color: var(--border-glow);
+      box-shadow: 0 0 35px rgba(0, 240, 144, 0.2);
+    }
+
+    .verdict-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .verdict-main {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .verdict-banner.attack .verdict-main {
+      color: var(--accent-danger);
+    }
+
+    .verdict-banner.normal .verdict-main {
+      color: var(--accent-safe);
+    }
+
+    .threat-score-gauge {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .threat-score-gauge .score-num {
+      font-size: 38px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+
+    .threat-score-gauge .score-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .verdict-banner.attack .score-num {
+      color: var(--accent-danger);
+    }
+
+    .verdict-banner.normal .score-num {
+      color: var(--accent-safe);
+    }
+
+    .consensus-pill {
+      margin-top: 10px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 3px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+    }
+
+    /* Model Cards Grid */
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .models-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .model-card {
+      background: rgba(10, 16, 26, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .model-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(15, 23, 38, 0.9);
+    }
+
+    .model-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .model-name {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .model-verdict-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .model-verdict-tag.normal {
+      background: var(--accent-safe-bg);
+      color: var(--accent-safe);
+    }
+
+    .model-verdict-tag.attack {
+      background: var(--accent-danger-bg);
+      color: var(--accent-danger);
+    }
+
+    .model-confidence-val {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-wrap {
+      height: 4px;
+      background: #1e293b;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-bar-fill.normal {
+      background: var(--accent-safe);
+      box-shadow: 0 0 8px var(--accent-safe);
+    }
+
+    .progress-bar-fill.attack {
+      background: var(--accent-danger);
+      box-shadow: 0 0 8px var(--accent-danger);
+    }
+
+    /* Risk Factors / Signature Badges */
+    .risk-section {
+      margin-bottom: 20px;
+    }
+
+    .risk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .risk-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(10, 16, 26, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    .risk-item.critical {
+      border-left: 3px solid var(--accent-danger);
+    }
+
+    .risk-item.high {
+      border-left: 3px solid var(--accent-danger);
+    }
+
+    .risk-item.medium {
+      border-left: 3px solid var(--accent-amber);
+    }
+
+    .risk-item.info {
+      border-left: 3px solid var(--accent-safe);
+    }
+
+    .risk-icon {
+      margin-top: 2px;
+      font-size: 13px;
+    }
+
+    .risk-item.critical .risk-icon,
+    .risk-item.high .risk-icon {
+      color: var(--accent-danger);
+    }
+
+    .risk-item.medium .risk-icon {
+      color: var(--accent-amber);
+    }
+
+    .risk-item.info .risk-icon {
+      color: var(--accent-safe);
+    }
+
+    .risk-content strong {
+      display: block;
+      color: var(--text-main);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .risk-content span {
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* =====================================================================
+       GEMINI AI SECURITY ASSISTANT PANEL
+       ===================================================================== */
+    .ai-assistant-panel {
+      background: linear-gradient(180deg, rgba(14, 21, 33, 0.9) 0%, rgba(9, 14, 24, 0.95) 100%);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      border-radius: 16px;
+      margin-top: 24px;
+      padding: 24px;
+    }
+
+    .ai-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+    }
+
+    .ai-badge {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(168, 85, 247, 0.2));
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      color: var(--accent-cyan);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-content {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+
+    .ai-content h3 {
+      font-size: 14px;
+      color: var(--accent-cyan);
+      margin: 16px 0 8px 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ai-content p {
+      margin-bottom: 10px;
+    }
+
+    .ai-content ul {
+      margin-left: 18px;
+      margin-bottom: 12px;
+    }
+
+    .ai-content li {
+      margin-bottom: 4px;
+    }
+
+    .ai-content code {
+      font-family: var(--font-mono);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent-safe);
+      font-size: 12px;
+    }
+
+    .ai-content pre {
+      background: #090e17;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .ai-content pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: #38bdf8;
+    }
+
+    /* Interactive AI Chat */
+    .ai-chat-section {
+      margin-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 18px;
+    }
+
+    .chat-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .chip-btn {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-btn:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-bg);
+    }
+
+    .chat-box {
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-right: 4px;
+    }
+
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+      background: rgba(0, 229, 255, 0.15);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: #ffffff;
+      max-width: 80%;
+    }
+
+    .chat-msg.assistant {
+      align-self: flex-start;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: #e2e8f0;
+      max-width: 90%;
+    }
+
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(8, 12, 20, 0.9);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 11px 16px;
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+
+    .chat-send-btn {
+      background: var(--accent-cyan);
+      border: none;
+      color: #060e14;
+      padding: 0 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .chat-send-btn:hover {
+      filter: brightness(1.15);
+      transform: scale(1.05);
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* =====================================================================
+       DATASET STREAM VIEW
+       ===================================================================== */
+    .dataset-view {
+      display: none;
+    }
+
+    .dataset-view.active {
+      display: block;
+    }
+
+    .sample-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .btn-pull {
+      background: linear-gradient(135deg, #00f090 0%, #00e5ff 100%);
+      color: #060e14;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s;
+      box-shadow: 0 0 20px rgba(0, 240, 144, 0.25);
+    }
+
+    .btn-pull:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 240, 144, 0.45);
+    }
+
+    .features-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      margin-top: 14px;
+    }
+
+    .features-table th,
+    .features-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+
+    .features-table th {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+
+    .features-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* =====================================================================
+       MODAL STYLES (GEMINI API KEY)
+       ===================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(4, 7, 12, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.15);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: #ffffff;
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+    }
+  </style>
 </head>
+
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>NIDS<span>_</span>Console</h1>
-      <div class="sub">network intrusion detection // local demo</div>
+
+  <div class="container">
+
+    <!-- =====================================================================
+       HEADER
+       ===================================================================== -->
+    <header>
+      <div class="brand-section">
+        <img src="/static/nids_logo.png" alt="NIDS Logo" class="brand-logo-img" onerror="this.style.display='none'">
+        <div class="brand-text">
+          <h1>NIDS <span>Console</span> <span class="status-badge"><span class="pulse-dot"></span> 3 ML Models
+              Active</span></h1>
+          <p>Network Intrusion Detection System</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="key-btn" id="key-modal-trigger" onclick="openKeyModal()">
+          <i class="fa-solid fa-key"></i>
+          <span id="key-btn-text">Gemini API Key</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- =====================================================================
+       NAVIGATION TABS
+       ===================================================================== */ -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-manual-btn" onclick="switchTab('manual')">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Manual Traffic Lab (User Input)</span>
+      </button>
+      <button class="tab-btn" id="tab-dataset-btn" onclick="switchTab('dataset')">
+        <i class="fa-solid fa-database"></i>
+        <span>CIC Dataset Stream (Held-Out Samples)</span>
+      </button>
     </div>
-    <button id="pull-btn" onclick="pullSample()">Pull traffic sample</button>
-  </header>
 
-  <div class="panel">
-    <div class="panel-title">Traffic record (from held-out test set)</div>
-    <div id="feature-box" class="placeholder">No record loaded yet. Click "Pull traffic sample" above.</div>
+    <!-- =====================================================================
+       MAIN GRID
+       ===================================================================== -->
+    <div class="main-grid">
+
+      <!-- LEFT COLUMN: INPUT / TRAFFIC CONFIGURATION -->
+      <div>
+
+        <!-- MODE A: MANUAL TRAFFIC LAB -->
+        <div id="manual-view" class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-network-wired"></i>
+              <span>Network Traffic Configuration</span>
+            </div>
+            <button class="btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="resetFormToDefaults()">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
+
+          <!-- 1-Click Presets -->
+          <div class="preset-section">
+            <div class="preset-label">
+              <span> Quick Attack & Benign Presets</span>
+              <span style="font-size: 10px; color: var(--accent-cyan);"><i class="fa-solid fa-bolt"></i> 1-Click
+                Load</span>
+            </div>
+            <div class="preset-grid" id="presets-container">
+              <!-- Populated dynamically by JS -->
+            </div>
+          </div>
+
+          <form id="traffic-form" onsubmit="event.preventDefault(); analyzeManualTraffic();">
+
+            <!-- Core Transport & Protocol -->
+            <div class="form-section-title">
+              <i class="fa-solid fa-layer-group"></i> Core Protocol & Handshake
+            </div>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label for="inp-protocol">Protocol Type</label>
+                <select id="inp-protocol" class="form-control">
+                  <option value="tcp" selected>TCP</option>
+                  <option value="udp">UDP</option>
+                  <option value="icmp">ICMP</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="inp-service">Target Service</label>
+                <select id="inp-service" class="form-control">
+                  <option value="http" selected>http (Web)</option>
+                  <option value="ftp">ftp (File)</option>
+                  <option value="ftp_data">ftp_data</option>
+                  <option value="smtp">smtp (Mail)</option>
+                  <option value="domain_u">domain_u (DNS)</option>
+                  <option value="telnet">telnet (Remote CLI)</option>
+                  <option value="ssh">ssh (Secure Shell)</option>
+                  <option value="private">private (Non-Standard)</option>
+                  <option value="eco_i">eco_i (ICMP Echo)</option>
+                  <option value="ecr_i">ecr_i (ICMP Reply)</option>
+                  <option value="other">other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="inp-flag">Connection Flag</label>
+                <select id="inp-flag" class="form-control">
+                  <option value="SF" selected>SF (Normal / Established)</option>
+                  <option value="S0">S0 (SYN Sent / No ACK - Flood)</option>
+                  <option value="REJ">REJ (Rejected Connection)</option>
+                  <option value="RSTO">RSTO (Reset by Originator)</option>
+                  <option value="RSTR">RSTR (Reset by Responder)</option>
+                  <option value="SH">SH (SYN Sent & Reset)</option>
+                  <option value="OTH">OTH (Other Flag)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Payload & Session Volume -->
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label for="inp-duration">Duration (sec)</label>
+                <input type="number" id="inp-duration" class="form-control" value="0" min="0" step="1">
+              </div>
+              <div class="form-group">
+                <label for="inp-src-bytes">Source Bytes</label>
+                <input type="number" id="inp-src-bytes" class="form-control" value="312" min="0" step="1">
+              </div>
+              <div class="form-group">
+                <label for="inp-dst-bytes">Destination Bytes</label>
+                <input type="number" id="inp-dst-bytes" class="form-control" value="4820" min="0" step="1">
+              </div>
+            </div>
+
+            <!-- Authentication & Content Indicators -->
+            <div class="form-section-title">
+              <i class="fa-solid fa-user-shield"></i> Authentication & Session Flags
+            </div>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label for="inp-logged-in">Logged In Status</label>
+                <select id="inp-logged-in" class="form-control">
+                  <option value="1" selected>1 — Authenticated</option>
+                  <option value="0">0 — Unauthenticated</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="inp-failed-logins">Failed Logins</label>
+                <input type="number" id="inp-failed-logins" class="form-control" value="0" min="0" max="20" step="1">
+              </div>
+              <div class="form-group">
+                <label for="inp-root-shell">Root Shell Attempt</label>
+                <select id="inp-root-shell" class="form-control">
+                  <option value="0" selected>0 — Normal User</option>
+                  <option value="1">1 — Root Shell Requested</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Traffic Density & Error Rates -->
+            <div class="form-section-title">
+              <i class="fa-solid fa-chart-line"></i> Traffic Burst & Error Rates
+            </div>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="inp-count">Host Connection Count: <span id="val-count" class="val-badge">6</span></label>
+                <input type="range" id="inp-count" class="slider-control" min="1" max="512" value="6"
+                  oninput="document.getElementById('val-count').textContent=this.value">
+              </div>
+              <div class="form-group">
+                <label for="inp-srv-count">Service Count: <span id="val-srv-count" class="val-badge">6</span></label>
+                <input type="range" id="inp-srv-count" class="slider-control" min="1" max="512" value="6"
+                  oninput="document.getElementById('val-srv-count').textContent=this.value">
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="inp-serror-rate">SYN Error Rate: <span id="val-serror-rate"
+                    class="val-badge">0.00</span></label>
+                <input type="range" id="inp-serror-rate" class="slider-control" min="0" max="1" step="0.05" value="0"
+                  oninput="document.getElementById('val-serror-rate').textContent=parseFloat(this.value).toFixed(2)">
+              </div>
+              <div class="form-group">
+                <label for="inp-rerror-rate">REJ Error Rate: <span id="val-rerror-rate"
+                    class="val-badge">0.00</span></label>
+                <input type="range" id="inp-rerror-rate" class="slider-control" min="0" max="1" step="0.05" value="0"
+                  oninput="document.getElementById('val-rerror-rate').textContent=parseFloat(this.value).toFixed(2)">
+              </div>
+            </div>
+
+            <!-- Expandable Advanced 40-Feature Matrix -->
+            <div class="advanced-accordion">
+              <div class="accordion-header" onclick="toggleAdvancedAccordion()">
+                <span><i class="fa-solid fa-microchip"></i> Advanced CIC Host & Rate Parameters</span>
+                <i id="accordion-icon" class="fa-solid fa-chevron-down"></i>
+              </div>
+              <div class="accordion-content" id="advanced-accordion-body">
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="inp-same-srv-rate">Same Srv Rate</label>
+                    <input type="number" id="inp-same-srv-rate" class="form-control" value="1.0" min="0" max="1"
+                      step="0.05">
+                  </div>
+                  <div class="form-group">
+                    <label for="inp-diff-srv-rate">Diff Srv Rate</label>
+                    <input type="number" id="inp-diff-srv-rate" class="form-control" value="0.0" min="0" max="1"
+                      step="0.05">
+                  </div>
+                  <div class="form-group">
+                    <label for="inp-dst-host-count">Dst Host Count</label>
+                    <input type="number" id="inp-dst-host-count" class="form-control" value="35" min="0" max="255">
+                  </div>
+                </div>
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="inp-dst-host-srv-count">Dst Host Srv Count</label>
+                    <input type="number" id="inp-dst-host-srv-count" class="form-control" value="255" min="0" max="255">
+                  </div>
+                  <div class="form-group">
+                    <label for="inp-dst-host-same-srv-rate">Dst Host Same Srv</label>
+                    <input type="number" id="inp-dst-host-same-srv-rate" class="form-control" value="1.0" min="0"
+                      max="1" step="0.05">
+                  </div>
+                  <div class="form-group">
+                    <label for="inp-dst-host-diff-srv-rate">Dst Host Diff Srv</label>
+                    <input type="number" id="inp-dst-host-diff-srv-rate" class="form-control" value="0.0" min="0"
+                      max="1" step="0.05">
+                  </div>
+                </div>
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="inp-dst-host-serror-rate">Dst Host Serror Rate</label>
+                    <input type="number" id="inp-dst-host-serror-rate" class="form-control" value="0.0" min="0" max="1"
+                      step="0.05">
+                  </div>
+                  <div class="form-group">
+                    <label for="inp-dst-host-rerror-rate">Dst Host Rerror Rate</label>
+                    <input type="number" id="inp-dst-host-rerror-rate" class="form-control" value="0.0" min="0" max="1"
+                      step="0.05">
+                  </div>
+                  <div class="form-group">
+                    <label for="inp-num-compromised">Compromised Conditions</label>
+                    <input type="number" id="inp-num-compromised" class="form-control" value="0" min="0">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-row">
+              <button type="submit" id="btn-analyze-manual" class="btn-analyze">
+                <i class="fa-solid fa-radar"></i> Analyze Network Traffic
+              </button>
+              <button type="button" class="btn-secondary" onclick="randomizeInputs()">
+                <i class="fa-solid fa-shuffle"></i> Fuzz
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- MODE B: DATASET STREAM INSPECTOR -->
+        <div id="dataset-view" class="panel dataset-view">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-database"></i>
+              <span>Held-Out CIC Dataset</span>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted);">Data and Label Dataset</span>
+          </div>
+
+          <div class="sample-controls-bar">
+            <div>
+              <div style="font-weight: 700; font-size: 14px;">Live Evaluation Sampler</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Extracts an un-tampered record from the validation
+                set to benchmark ground truth.</div>
+            </div>
+            <button id="pull-btn" class="btn-pull" onclick="pullRandomSample()">
+              <i class="fa-solid fa-arrows-rotate"></i> Pull Traffic Sample
+            </button>
+          </div>
+
+          <div id="dataset-ground-truth-banner" style="display: none; margin-bottom: 16px;"></div>
+
+          <div
+            style="font-size: 11px; text-transform: uppercase; color: var(--accent-cyan); letter-spacing: 1px; margin-bottom: 8px;">
+            Telemetry Matrix for Sample <span id="sample-idx-tag">#--</span>
+          </div>
+          <div
+            style="max-height: 380px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 10px;">
+            <table class="features-table" id="dataset-features-table">
+              <thead>
+                <tr>
+                  <th>Feature Name</th>
+                  <th>Recorded Telemetry Value</th>
+                </tr>
+              </thead>
+              <tbody id="dataset-features-body">
+                <tr>
+                  <td colspan="2" style="text-align: center; color: var(--text-dim); padding: 30px;">
+                    Click "Pull Traffic Sample" above to stream a record from the test set.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: LIVE THREAT TELEMETRY & MODEL BREAKDOWN -->
+      <div>
+
+        <!-- Primary Threat Banner -->
+        <div class="verdict-banner" id="verdict-banner">
+          <div class="verdict-title">Network Intrusion Verdict</div>
+          <div class="verdict-main" id="verdict-main-text">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>READY TO SCAN</span>
+          </div>
+          <div class="threat-score-gauge">
+            <span class="score-num" id="threat-score-num">--</span>
+            <span class="score-label">% Threat Probability</span>
+          </div>
+          <div class="consensus-pill" id="consensus-pill">
+            Consensus: Awaiting Analysis
+          </div>
+        </div>
+
+        <!-- Individual ML Model Decision Cards -->
+        <div class="models-grid">
+
+          <!-- Decision Tree -->
+          <div class="model-card">
+            <div class="model-card-header">
+              <span class="model-name">Decision Tree</span>
+              <span class="model-verdict-tag" id="tag-dt">--</span>
+            </div>
+            <div class="model-confidence-val" id="conf-dt">--%</div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="bar-dt" style="width: 0%;"></div>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 6px;" id="match-dt"></div>
+          </div>
+
+          <!-- Random Forest -->
+          <div class="model-card">
+            <div class="model-card-header">
+              <span class="model-name">Random Forest</span>
+              <span class="model-verdict-tag" id="tag-rf">--</span>
+            </div>
+            <div class="model-confidence-val" id="conf-rf">--%</div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="bar-rf" style="width: 0%;"></div>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 6px;" id="match-rf"></div>
+          </div>
+
+          <!-- Naive Bayes -->
+          <div class="model-card">
+            <div class="model-card-header">
+              <span class="model-name">Naive Bayes</span>
+              <span class="model-verdict-tag" id="tag-nb">--</span>
+            </div>
+            <div class="model-confidence-val" id="conf-nb">--%</div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="bar-nb" style="width: 0%;"></div>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); margin-top: 6px;" id="match-nb"></div>
+          </div>
+
+        </div>
+
+        <!-- Detected Risk Factor Signatures -->
+        <div class="panel risk-section">
+          <div class="panel-header" style="padding-bottom: 10px; margin-bottom: 12px;">
+            <div class="panel-title" style="font-size: 13px;">
+              <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber);"></i>
+              <span>Signature & Heuristic Anomalies</span>
+            </div>
+          </div>
+          <div class="risk-list" id="risk-factors-list">
+            <div style="font-size: 12px; color: var(--text-dim); text-align: center; padding: 12px;">
+              No anomalous indicators evaluated yet.
+            </div>
+          </div>
+        </div>
+
+        <!-- GEMINI AI SECURITY ASSISTANT PANEL -->
+        <div class="ai-assistant-panel" id="ai-panel">
+          <div class="ai-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-cyan); font-size: 16px;"></i>
+              <span style="font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">AI
+                Security Analyst</span>
+            </div>
+            <div class="ai-badge" id="ai-model-badge">
+              <i class="fa-solid fa-robot"></i> <span id="ai-badge-label">Gemini 2.5 Flash</span>
+            </div>
+          </div>
+
+          <div class="ai-content" id="ai-explanation-content">
+            Click <strong>Analyze Network Traffic</strong> or <strong>Pull Traffic Sample</strong> to generate an
+            instant technical threat evaluation.
+          </div>
+
+          <!-- Interactive AI Chat Box -->
+          <div class="ai-chat-section">
+            <div
+              style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px;">
+              <i class="fa-solid fa-comments"></i> Ask Incident Response Assistant
+            </div>
+            <div class="chat-suggestions">
+              <button class="chip-btn" onclick="askQuickQuestion('How do I block this traffic using iptables?')">
+                Generate iptables rule
+              </button>
+              <button class="chip-btn"
+                onclick="askQuickQuestion('Why did the machine learning models arrive at this verdict?')">
+                Explain model decision
+              </button>
+              <button class="chip-btn" onclick="askQuickQuestion('Create a Snort IDS signature for this anomaly.')">
+                Create Snort signature
+              </button>
+            </div>
+            <div class="chat-box" id="ai-chat-history"></div>
+            <div class="chat-input-bar">
+              <input type="text" id="ai-chat-input" class="chat-input"
+                placeholder="Ask a question about this traffic sample or mitigation..."
+                onkeydown="if(event.key==='Enter') sendChatMessage()">
+              <button id="ai-chat-send-btn" class="chat-send-btn" onclick="sendChatMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <footer>
+      NIDS Console · Decision Tree & Random Forest & Naive Bayes trained on NSL-KDD · Powered by Google Gemini AI
+    </footer>
+
   </div>
 
-  <div id="truth-box"></div>
-
-  <div class="panel ai-panel" id="ai-panel" style="display:none;">
-    <div class="ai-title">AI assistant</div>
-    <div id="ai-explanation"></div>
+  <!-- =====================================================================
+     GEMINI API KEY MODAL
+     ===================================================================== -->
+  <div class="modal-overlay" id="key-modal" onclick="if(event.target===this) closeKeyModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-key" style="color: var(--accent-cyan);"></i>
+          <span>Gemini API Configuration</span>
+        </div>
+        <button class="modal-close" onclick="closeKeyModal()">&times;</button>
+      </div>
+      <div class="modal-desc">
+        Enter your Google Gemini API key to enable live threat explanations, attack root-cause diagnostics, and
+        interactive SOC analyst querying. Your key is stored securely in your local browser storage.
+      </div>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="gemini-key-input">Gemini API Key (AI Studio)</label>
+        <div style="position: relative;">
+          <input type="password" id="gemini-key-input" class="form-control" placeholder="AIzaSy..."
+            style="padding-right: 40px;">
+          <button type="button" onclick="toggleKeyVisibility()"
+            style="position: absolute; right: 10px; top: 10px; background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
+            <i id="eye-icon" class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+        <span style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Get your free API key at <a
+            href="https://aistudio.google.com/app/apikey" target="_blank"
+            style="color: var(--accent-cyan); text-decoration: none;">aistudio.google.com</a></span>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn-secondary" onclick="clearGeminiKey()">Clear</button>
+        <button class="btn-analyze" style="padding: 10px 20px; font-size: 13px;" onclick="saveGeminiKey()">Save
+          Key</button>
+      </div>
+    </div>
   </div>
 
-  <div class="panel" id="predictions-panel" style="display:none;">
-    <div class="panel-title">Model verdicts</div>
-    <div id="predictions"></div>
-  </div>
+  <script>
+    let activeTab = 'manual';
+    let presetsData = [];
+    let currentSampleContext = null;
 
-  <footer>Decision Tree · Random Forest · Naive Bayes — trained on NSL-KDD</footer>
-</div>
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPresets();
+      checkStoredGeminiKey();
+      // Auto-analyze default normal preset at startup
+      setTimeout(() => {
+        analyzeManualTraffic();
+      }, 400);
+    });
 
-<script>
-async function pullSample() {
-  const btn = document.getElementById('pull-btn');
-  btn.disabled = true;
-  btn.textContent = 'Reading...';
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('tab-manual-btn').classList.toggle('active', tab === 'manual');
+      document.getElementById('tab-dataset-btn').classList.toggle('active', tab === 'dataset');
 
-  try {
-    const res = await fetch('/api/random_sample');
-    const data = await res.json();
-    renderFeatures(data.features);
-    renderTruth(data.true_label);
-    renderPredictions(data.predictions, data.true_label);
-  } catch (e) {
-    document.getElementById('feature-box').textContent = 'Error loading sample — is app.py running with trained models in models/?';
-  }
+      document.getElementById('manual-view').style.display = tab === 'manual' ? 'block' : 'none';
+      document.getElementById('dataset-view').style.display = tab === 'dataset' ? 'block' : 'none';
+    }
 
-  btn.disabled = false;
-  btn.textContent = 'Pull traffic sample';
-}
+    // =====================================================================
+    // GEMINI API KEY MANAGEMENT
+    // =====================================================================
+    function getGeminiKey() {
+      return localStorage.getItem('gemini_api_key') || '';
+    }
 
-function renderFeatures(features) {
-  const box = document.getElementById('feature-box');
-  box.className = '';
-  box.innerHTML = '<div class="feature-grid">' +
-    Object.entries(features).map(([k, v]) =>
-      `<div><span>${k}</span><span>${v}</span></div>`
-    ).join('') +
-    '</div>';
-}
+    function checkStoredGeminiKey() {
+      const key = getGeminiKey();
+      const btn = document.getElementById('key-modal-trigger');
+      const text = document.getElementById('key-btn-text');
+      const badgeLabel = document.getElementById('ai-badge-label');
 
-function renderTruth(trueLabel) {
-  const box = document.getElementById('truth-box');
-  box.innerHTML = `<div class="truth-banner ${trueLabel}">
-    Ground truth: ${trueLabel === 'attack' ? 'Malicious traffic' : 'Normal traffic'}
-  </div>`;
-}
+      if (key) {
+        btn.classList.add('has-key');
+        text.textContent = 'Gemini Key Configured ✓';
+        badgeLabel.textContent = 'Gemini 2.5 Flash (Active)';
+        document.getElementById('gemini-key-input').value = key;
+      } else {
+        btn.classList.remove('has-key');
+        text.textContent = 'Set Gemini API Key';
+        badgeLabel.textContent = 'Gemini (Local Fallback)';
+      }
+    }
 
-function renderPredictions(predictions, trueLabel) {
-  document.getElementById('predictions-panel').style.display = 'block';
-  const el = document.getElementById('predictions');
-  el.innerHTML = Object.entries(predictions).map(([name, p]) => {
-    const correct = p.prediction === trueLabel;
-    return `<div class="model-row">
-      <span class="model-name">${name.replace('_', ' ')}</span>
-      <span>
-        <span class="verdict ${p.prediction}">${p.prediction}</span>
-        <span class="confidence">${(p.confidence * 100).toFixed(1)}% confidence</span>
-        <span class="correct-tag ${correct ? 'yes' : 'no'}">${correct ? '✓ correct' : '✗ missed'}</span>
-      </span>
-    </div>`;
-  }).join('');
-}
+    function openKeyModal() {
+      document.getElementById('key-modal').classList.add('open');
+      document.getElementById('gemini-key-input').value = getGeminiKey();
+    }
 
-function renderAI(explanation) {
-  document.getElementById('ai-panel').style.display = 'block';
-  document.getElementById('ai-explanation').textContent = explanation;
-}
+    function closeKeyModal() {
+      document.getElementById('key-modal').classList.remove('open');
+    }
 
-async function pullSample() {
-  const btn = document.getElementById('pull-btn');
-  btn.disabled = true;
-  btn.textContent = 'Reading...';
+    function toggleKeyVisibility() {
+      const inp = document.getElementById('gemini-key-input');
+      const icon = document.getElementById('eye-icon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        inp.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
 
-  try {
-    const res = await fetch('/api/random_sample');
-    const data = await res.json();
-    renderFeatures(data.features);
-    renderTruth(data.true_label);
-    renderPredictions(data.predictions, data.true_label);
-    renderAI(data.ai_explanation);
-  } catch (e) {
-    document.getElementById('feature-box').textContent = 'Error loading sample — is app.py running with trained models in models/?';
-  }
+    function saveGeminiKey() {
+      const key = document.getElementById('gemini-key-input').value.trim();
+      if (key) {
+        localStorage.setItem('gemini_api_key', key);
+      } else {
+        localStorage.removeItem('gemini_api_key');
+      }
+      checkStoredGeminiKey();
+      closeKeyModal();
+    }
 
-  btn.disabled = false;
-  btn.textContent = 'Pull traffic sample';
-}
-</script>
+    function clearGeminiKey() {
+      localStorage.removeItem('gemini_api_key');
+      document.getElementById('gemini-key-input').value = '';
+      checkStoredGeminiKey();
+      closeKeyModal();
+    }
+
+    // =====================================================================
+    // PRESETS & FORM
+    // =====================================================================
+    async function loadPresets() {
+      try {
+        const res = await fetch('/api/presets');
+        presetsData = await res.json();
+        const container = document.getElementById('presets-container');
+
+        container.innerHTML = presetsData.map((p, idx) => `
+        <div class="preset-card ${idx === 0 ? 'active' : ''}" onclick="applyPreset('${p.id}', this)">
+          <div class="preset-top">
+            <span class="preset-tag ${p.type}">${p.badge}</span>
+            <i class="fa-solid ${p.type === 'attack' ? 'fa-skull-crossbones' : 'fa-circle-check'}" style="font-size: 11px; color: ${p.type === 'attack' ? 'var(--accent-danger)' : 'var(--accent-safe)'}"></i>
+          </div>
+          <div class="preset-name">${p.name}</div>
+        </div>
+      `).join('');
+      } catch (e) {
+        console.error('Failed to load presets', e);
+      }
+    }
+
+    function applyPreset(presetId, cardEl) {
+      document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+      if (cardEl) cardEl.classList.add('active');
+
+      const preset = presetsData.find(p => p.id === presetId);
+      if (!preset) return;
+
+      const f = preset.features;
+      document.getElementById('inp-protocol').value = f.protocol_type || 'tcp';
+      document.getElementById('inp-service').value = f.service || 'http';
+      document.getElementById('inp-flag').value = f.flag || 'SF';
+      document.getElementById('inp-duration').value = f.duration || 0;
+      document.getElementById('inp-src-bytes').value = f.src_bytes || 0;
+      document.getElementById('inp-dst-bytes').value = f.dst_bytes || 0;
+      document.getElementById('inp-logged-in').value = f.logged_in !== undefined ? f.logged_in : 1;
+      document.getElementById('inp-failed-logins').value = f.num_failed_logins || 0;
+      document.getElementById('inp-root-shell').value = f.root_shell || 0;
+
+      document.getElementById('inp-count').value = f.count || 1;
+      document.getElementById('val-count').textContent = f.count || 1;
+      document.getElementById('inp-srv-count').value = f.srv_count || 1;
+      document.getElementById('val-srv-count').textContent = f.srv_count || 1;
+
+      document.getElementById('inp-serror-rate').value = f.serror_rate || 0;
+      document.getElementById('val-serror-rate').textContent = parseFloat(f.serror_rate || 0).toFixed(2);
+      document.getElementById('inp-rerror-rate').value = f.rerror_rate || 0;
+      document.getElementById('val-rerror-rate').textContent = parseFloat(f.rerror_rate || 0).toFixed(2);
+
+      // Advanced fields
+      if (f.same_srv_rate !== undefined) document.getElementById('inp-same-srv-rate').value = f.same_srv_rate;
+      if (f.diff_srv_rate !== undefined) document.getElementById('inp-diff-srv-rate').value = f.diff_srv_rate;
+      if (f.dst_host_count !== undefined) document.getElementById('inp-dst-host-count').value = f.dst_host_count;
+      if (f.dst_host_srv_count !== undefined) document.getElementById('inp-dst-host-srv-count').value = f.dst_host_srv_count;
+      if (f.dst_host_same_srv_rate !== undefined) document.getElementById('inp-dst-host-same-srv-rate').value = f.dst_host_same_srv_rate;
+      if (f.dst_host_diff_srv_rate !== undefined) document.getElementById('inp-dst-host-diff-srv-rate').value = f.dst_host_diff_srv_rate;
+      if (f.dst_host_serror_rate !== undefined) document.getElementById('inp-dst-host-serror-rate').value = f.dst_host_serror_rate;
+      if (f.dst_host_rerror_rate !== undefined) document.getElementById('inp-dst-host-rerror-rate').value = f.dst_host_rerror_rate;
+      if (f.num_compromised !== undefined) document.getElementById('inp-num-compromised').value = f.num_compromised;
+
+      // Automatically re-run prediction
+      analyzeManualTraffic();
+    }
+
+    function getManualFormData() {
+      return {
+        protocol_type: document.getElementById('inp-protocol').value,
+        service: document.getElementById('inp-service').value,
+        flag: document.getElementById('inp-flag').value,
+        duration: parseFloat(document.getElementById('inp-duration').value) || 0,
+        src_bytes: parseFloat(document.getElementById('inp-src-bytes').value) || 0,
+        dst_bytes: parseFloat(document.getElementById('inp-dst-bytes').value) || 0,
+        logged_in: parseInt(document.getElementById('inp-logged-in').value) || 0,
+        num_failed_logins: parseInt(document.getElementById('inp-failed-logins').value) || 0,
+        root_shell: parseInt(document.getElementById('inp-root-shell').value) || 0,
+        count: parseFloat(document.getElementById('inp-count').value) || 1,
+        srv_count: parseFloat(document.getElementById('inp-srv-count').value) || 1,
+        serror_rate: parseFloat(document.getElementById('inp-serror-rate').value) || 0,
+        rerror_rate: parseFloat(document.getElementById('inp-rerror-rate').value) || 0,
+        same_srv_rate: parseFloat(document.getElementById('inp-same-srv-rate').value) || 1.0,
+        diff_srv_rate: parseFloat(document.getElementById('inp-diff-srv-rate').value) || 0.0,
+        dst_host_count: parseFloat(document.getElementById('inp-dst-host-count').value) || 30,
+        dst_host_srv_count: parseFloat(document.getElementById('inp-dst-host-srv-count').value) || 255,
+        dst_host_same_srv_rate: parseFloat(document.getElementById('inp-dst-host-same-srv-rate').value) || 1.0,
+        dst_host_diff_srv_rate: parseFloat(document.getElementById('inp-dst-host-diff-srv-rate').value) || 0.0,
+        dst_host_serror_rate: parseFloat(document.getElementById('inp-dst-host-serror-rate').value) || 0.0,
+        dst_host_rerror_rate: parseFloat(document.getElementById('inp-dst-host-rerror-rate').value) || 0.0,
+        num_compromised: parseInt(document.getElementById('inp-num-compromised').value) || 0
+      };
+    }
+
+    function resetFormToDefaults() {
+      if (presetsData.length > 0) {
+        applyPreset(presetsData[0].id, document.querySelector('.preset-card'));
+      }
+    }
+
+    function randomizeInputs() {
+      const protocols = ['tcp', 'udp', 'icmp'];
+      const services = ['http', 'ftp', 'smtp', 'domain_u', 'private', 'telnet', 'ssh'];
+      const flags = ['SF', 'S0', 'REJ', 'RSTO'];
+
+      document.getElementById('inp-protocol').value = protocols[Math.floor(Math.random() * protocols.length)];
+      document.getElementById('inp-service').value = services[Math.floor(Math.random() * services.length)];
+      document.getElementById('inp-flag').value = flags[Math.floor(Math.random() * flags.length)];
+
+      const countVal = Math.floor(Math.random() * 400) + 1;
+      document.getElementById('inp-count').value = countVal;
+      document.getElementById('val-count').textContent = countVal;
+
+      const serrorVal = (Math.random() > 0.5 ? Math.random() : 0).toFixed(2);
+      document.getElementById('inp-serror-rate').value = serrorVal;
+      document.getElementById('val-serror-rate').textContent = serrorVal;
+
+      document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+      analyzeManualTraffic();
+    }
+
+    function toggleAdvancedAccordion() {
+      const body = document.getElementById('advanced-accordion-body');
+      const icon = document.getElementById('accordion-icon');
+      body.classList.toggle('open');
+      if (body.classList.contains('open')) {
+        icon.className = 'fa-solid fa-chevron-up';
+      } else {
+        icon.className = 'fa-solid fa-chevron-down';
+      }
+    }
+
+    // =====================================================================
+    // API CALLS & RENDERING
+    // =====================================================================
+    async function analyzeManualTraffic() {
+      const btn = document.getElementById('btn-analyze-manual');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing...';
+
+      const features = getManualFormData();
+      const apiKey = getGeminiKey();
+
+      try {
+        const res = await fetch('/api/predict_manual', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Gemini-Api-Key': apiKey
+          },
+          body: JSON.stringify({
+            features: features,
+            gemini_api_key: apiKey
+          })
+        });
+
+        const data = await res.json();
+        currentSampleContext = data;
+        renderTelemetry(data);
+      } catch (e) {
+        console.error('Manual prediction error', e);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-radar"></i> Analyze Network Traffic';
+    }
+
+    async function pullRandomSample() {
+      const btn = document.getElementById('pull-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Streaming...';
+
+      const apiKey = getGeminiKey();
+
+      try {
+        const res = await fetch('/api/random_sample', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Gemini-Api-Key': apiKey
+          },
+          body: JSON.stringify({
+            gemini_api_key: apiKey
+          })
+        });
+
+        const data = await res.json();
+        currentSampleContext = data;
+        renderDatasetSampleTable(data);
+        renderTelemetry(data);
+      } catch (e) {
+        console.error('Sample pull error', e);
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Pull Traffic Sample';
+    }
+
+    function renderDatasetSampleTable(data) {
+      document.getElementById('sample-idx-tag').textContent = `#${data.sample_index}`;
+
+      // Render Ground Truth Banner
+      const gtBanner = document.getElementById('dataset-ground-truth-banner');
+      gtBanner.style.display = 'block';
+      const isAttack = data.true_label === 'attack';
+      gtBanner.innerHTML = `
+      <div style="padding: 12px 16px; border-radius: 10px; background: ${isAttack ? 'var(--accent-danger-bg)' : 'var(--accent-safe-bg)'}; border: 1px solid ${isAttack ? 'var(--border-danger)' : 'var(--border-glow)'}; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; font-size: 13px; color: ${isAttack ? 'var(--accent-danger)' : 'var(--accent-safe)'}; text-transform: uppercase;">
+          <i class="fa-solid ${isAttack ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+          Ground Truth Label: ${isAttack ? 'Malicious Attack' : 'Normal Benign Traffic'}
+        </span>
+        <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Sample Index #${data.sample_index}</span>
+      </div>
+    `;
+
+      // Render Table
+      const tbody = document.getElementById('dataset-features-body');
+      const f = data.all_features || data.features;
+      tbody.innerHTML = Object.entries(f).map(([k, v]) => `
+      <tr>
+        <td style="color: var(--text-muted);">${k}</td>
+        <td style="color: var(--text-main); font-weight: 600;">${v}</td>
+      </tr>
+    `).join('');
+    }
+
+    function renderTelemetry(data) {
+      const isMalicious = data.consensus_verdict === 'attack';
+      const banner = document.getElementById('verdict-banner');
+
+      // Main Verdict Banner
+      banner.className = `verdict-banner ${data.consensus_verdict}`;
+      document.getElementById('verdict-main-text').innerHTML = `
+      <i class="fa-solid ${isMalicious ? 'fa-biohazard' : 'fa-shield-halved'}"></i>
+      <span>${isMalicious ? 'MALICIOUS ATTACK' : 'BENIGN / NORMAL'}</span>
+    `;
+
+      document.getElementById('threat-score-num').textContent = data.threat_score.toFixed(1);
+
+      const attackVotes = data.attack_votes;
+      const totalModels = Object.keys(data.predictions).length;
+      document.getElementById('consensus-pill').textContent =
+        `Consensus: ${attackVotes}/${totalModels} Models Flagged Attack (${attackVotes === 0 || attackVotes === 3 ? '100% Unanimous' : 'Split Verdict'})`;
+
+      // Render individual model cards
+      const modelKeys = {
+        'decision_tree': { tag: 'tag-dt', conf: 'conf-dt', bar: 'bar-dt', match: 'match-dt' },
+        'random_forest': { tag: 'tag-rf', conf: 'conf-rf', bar: 'bar-rf', match: 'match-rf' },
+        'naive_bayes': { tag: 'tag-nb', conf: 'conf-nb', bar: 'bar-nb', match: 'match-nb' }
+      };
+
+      for (const [key, els] of Object.entries(modelKeys)) {
+        const p = data.predictions[key];
+        if (!p) continue;
+
+        const tagEl = document.getElementById(els.tag);
+        const confEl = document.getElementById(els.conf);
+        const barEl = document.getElementById(els.bar);
+        const matchEl = document.getElementById(els.match);
+
+        tagEl.className = `model-verdict-tag ${p.prediction}`;
+        tagEl.textContent = p.prediction;
+
+        const confPct = (p.confidence * 100).toFixed(1);
+        confEl.textContent = `${confPct}%`;
+
+        barEl.className = `progress-bar-fill ${p.prediction}`;
+        barEl.style.width = `${confPct}%`;
+
+        if (data.true_label) {
+          const isCorrect = p.prediction === data.true_label;
+          matchEl.innerHTML = isCorrect ?
+            '<span style="color: var(--accent-safe);"><i class="fa-solid fa-check"></i> Matches Ground Truth</span>' :
+            '<span style="color: var(--accent-danger);"><i class="fa-solid fa-xmark"></i> Mismatch</span>';
+        } else {
+          matchEl.textContent = 'Confidence Score';
+        }
+      }
+
+      // Render Risk Factors
+      const riskContainer = document.getElementById('risk-factors-list');
+      if (data.risk_factors && data.risk_factors.length > 0) {
+        riskContainer.innerHTML = data.risk_factors.map(r => `
+        <div class="risk-item ${r.severity}">
+          <i class="fa-solid fa-circle-exclamation risk-icon"></i>
+          <div class="risk-content">
+            <strong>${r.title}</strong>
+            <span>${r.desc}</span>
+          </div>
+        </div>
+      `).join('');
+      } else {
+        riskContainer.innerHTML = `<div style="font-size: 12px; color: var(--text-dim); text-align: center; padding: 8px;">No risk alerts triggered.</div>`;
+      }
+
+      // Render AI Explanation
+      const aiEl = document.getElementById('ai-explanation-content');
+      if (window.marked && data.ai_explanation) {
+        aiEl.innerHTML = marked.parse(data.ai_explanation);
+      } else {
+        aiEl.textContent = data.ai_explanation || 'No summary available.';
+      }
+    }
+
+    // =====================================================================
+    // INTERACTIVE AI CHAT
+    // =====================================================================
+    function askQuickQuestion(questionText) {
+      document.getElementById('ai-chat-input').value = questionText;
+      sendChatMessage();
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const sendBtn = document.getElementById('ai-chat-send-btn');
+      const history = document.getElementById('ai-chat-history');
+
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Append user message
+      const userMsgEl = document.createElement('div');
+      userMsgEl.className = 'chat-msg user';
+      userMsgEl.textContent = message;
+      history.appendChild(userMsgEl);
+
+      input.value = '';
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+      // Append assistant typing placeholder
+      const assistantMsgEl = document.createElement('div');
+      assistantMsgEl.className = 'chat-msg assistant';
+      assistantMsgEl.innerHTML = '<em><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing with Gemini SOC Assistant...</em>';
+      history.appendChild(assistantMsgEl);
+      history.scrollTop = history.scrollHeight;
+
+      const apiKey = getGeminiKey();
+
+      try {
+        const res = await fetch('/api/ai_chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Gemini-Api-Key': apiKey
+          },
+          body: JSON.stringify({
+            message: message,
+            context: currentSampleContext || {},
+            gemini_api_key: apiKey
+          })
+        });
+
+        const data = await res.json();
+        if (data.reply) {
+          assistantMsgEl.innerHTML = window.marked ? marked.parse(data.reply) : data.reply;
+        } else {
+          assistantMsgEl.textContent = data.error || 'Failed to generate response.';
+        }
+      } catch (e) {
+        assistantMsgEl.textContent = 'Error connecting to AI chat service.';
+      }
+
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+      history.scrollTop = history.scrollHeight;
+    }
+  </script>
+
 </body>
+
 </html>
