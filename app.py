@@ -127,13 +127,4 @@ def random_sample():
 
     ai_explanation = get_ai_explanation(display_features, true_label_name, predictions)
 
-    return jsonify({
-        "features": display_features,
-        "true_label": true_label_name,
-        "predictions": predictions,
-        "ai_explanation": ai_explanation,
-    })
 
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
