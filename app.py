@@ -15,7 +15,6 @@ MODEL_NAMES = ["decision_tree", "random_forest", "naive_bayes"]
 OPENAI_MODEL = "gpt-3.5-turbo"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Load everything once at startup
 artifacts = joblib.load(os.path.join(MODELS_DIR, "artifacts.joblib"))
 X_test, y_test, X_test_raw = joblib.load(os.path.join(MODELS_DIR, "test_data.joblib"))
 models = {name: joblib.load(os.path.join(MODELS_DIR, f"{name}.joblib")) for name in MODEL_NAMES}
