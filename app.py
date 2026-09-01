@@ -114,7 +114,7 @@ def extract_risk_factors(features):
     if rerror > 0.4:
         risks.append({"title": "High REJ Error Rate", "desc": f"Host connection reject rate is {rerror * 100:.1f}%, often linked to automated port probing.", "severity": "high"})
 
-    # Authentication & privilege indicators
+    
     failed_logins = int(features.get("num_failed_logins", 0))
     if failed_logins > 0:
         risks.append({"title": "Failed Authentication Sequence", "desc": f"{failed_logins} failed login attempt(s) detected on destination service.", "severity": "high" if failed_logins >= 3 else "medium"})
