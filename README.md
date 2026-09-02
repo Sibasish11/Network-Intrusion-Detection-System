@@ -1,6 +1,6 @@
-# 🛡️ Network Intrusion Detection System
+#  Network Intrusion Detection System
 
-A machine-learning powered Network Intrusion Detection System (NIDS) with a friendly web dashboard. Feed it a network connection's traffic features and it tells you — in plain English — whether that traffic looks normal or malicious, how confident it is, and what you should do about it.
+A machine learning powered Network Intrusion Detection System (NIDS) with a friendly web dashboard. Feed it a network connection's traffic features and it tells you ,in plain English,  whether that traffic looks normal or malicious, how confident it is, and what you should do about it.
 
 <p align="center">
   <a href="https://network-intrusion-detection-system-p0ng.onrender.com/"><img src="https://img.shields.io/badge/demo-live-brightgreen" alt="Live Demo"></a>
@@ -18,22 +18,22 @@ A machine-learning powered Network Intrusion Detection System (NIDS) with a frie
 
 Under the hood, the app takes the classic network-flow feature set (things like `duration`, `protocol_type`, `service`, `flag`, `src_bytes`, `dst_bytes`, login and error-rate statistics, and host-based traffic aggregates) and runs it through three independently trained classifiers — **Decision Tree**, **Random Forest**, and **Naive Bayes**. Their votes are combined into a consensus verdict and a 0–100% threat score.
 
-On top of that, a rule-based engine flags specific suspicious patterns (incomplete handshakes, error-rate spikes, failed logins, privilege-escalation attempts, connection bursts, and more), and an optional AI layer — powered by Google Gemini or OpenAI — turns all of it into a short, readable incident report, styled like something a SOC analyst would write. No API key? No problem — a built-in local explanation engine covers the same ground.
+On top of that, a rule-based engine flags specific suspicious patterns (incomplete handshakes, error-rate spikes, failed logins, privilege-escalation attempts, connection bursts, and more), and an optional AI layer , powered by Google Gemini or OpenAI , turns all of it into a short, readable incident report, styled like something a SOC analyst would write. No API key? No problem — a built-in local explanation engine covers the same ground.
 
 ## ✨ Features
 
-- **Ensemble detection** — three models vote independently, and their agreement becomes a single threat score
-- **Manual inspection** — enter your own connection features and get an instant verdict
-- **Random sample explorer** — pull a real record from the held-out test set and compare the prediction against the ground-truth label
-- **Curated presets** — one-click example traffic scenarios, handy for quick demos
-- **Rule-based risk factors** — surfaces handshake anomalies, error-rate spikes, failed logins, root-shell attempts, and connection bursts without needing an LLM
-- **AI SOC analyst** — optional Gemini/OpenAI integration writes a plain-English threat assessment plus suggested firewall and IDS rules
-- **Follow-up chat** — ask the "analyst" why something was flagged, or ask for a ready-to-use `iptables`/Snort rule
-- **Works offline** — every feature above still functions with zero API keys configured, just with simpler local explanations
+- **Ensemble detection** : three models vote independently, and their agreement becomes a single threat score
+- **Manual inspection** : enter your own connection features and get an instant verdict
+- **Random sample explorer** : pull a real record from the held-out test set and compare the prediction against the ground-truth label
+- **Curated presets** : one click example traffic scenarios, handy for quick demos
+- **Rule-based risk factors** : surfaces handshake anomalies, error-rate spikes, failed logins, root-shell attempts, and connection bursts without needing an LLM
+- **AI SOC analyst** : optional Gemini/OpenAI integration writes a plain-English threat assessment plus suggested firewall and IDS rules
+- **Follow-up chat** : ask the "analyst" why something was flagged, or ask for a ready-to-use `iptables`/Snort rule
+- **Works offline** : every feature above still functions with zero API keys configured, just with simpler local explanations
 
 ## ⚙️ How It Works
 
-1. Traffic features arrive — typed in manually, chosen from a preset, or pulled at random from the test set.
+1. Traffic features arrive : typed in manually, chosen from a preset, or pulled at random from the test set.
 2. Missing fields are filled with neutral defaults, categorical fields (`protocol_type`, `service`, `flag`) are label-encoded, and the row is scaled with the saved `scaler`.
 3. The three models — Decision Tree, Random Forest, Naive Bayes — each classify the row and report a confidence score.
 4. Votes combine into a consensus verdict (an "attack" verdict needs at least 2 of 3 models to agree) and a threat score (the average attack probability across all three).
@@ -71,7 +71,6 @@ Network-Intrusion-Detection-System/
 ### Prerequisites
 
 - Python 3.9+
-- pip
 
 ### Installation
 
@@ -141,12 +140,3 @@ Contributions are welcome and appreciated. If you'd like to help out:
 4. Open a pull request describing what you changed and why
 
 Bug reports and feature suggestions are just as welcome as code — feel free to open an issue.
-
-## 📄 License
-
-This repository doesn't currently include a license file. If you're the maintainer, adding one (MIT is a common, permissive choice for projects like this) will make it clear how others can use and build on the code. Until then, please check with the repo owner before reusing it.
-
-## 🙌 Acknowledgments
-
-- Built around the widely-used KDD/NSL-KDD-style network intrusion feature set
-- AI-generated explanations powered by Google Gemini and OpenAI
