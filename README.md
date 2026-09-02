@@ -31,7 +31,7 @@ On top of that, a rule-based engine flags specific suspicious patterns (incomple
 - **Follow-up chat** : ask the "analyst" why something was flagged, or ask for a ready-to-use `iptables`/Snort rule
 - **Works offline** : every feature above still functions with zero API keys configured, just with simpler local explanations
 
-## ⚙️ How It Works
+## How It Works
 
 1. Traffic features arrive : typed in manually, chosen from a preset, or pulled at random from the test set.
 2. Missing fields are filled with neutral defaults, categorical fields (`protocol_type`, `service`, `flag`) are label-encoded, and the row is scaled with the saved `scaler`.
@@ -40,7 +40,7 @@ On top of that, a rule-based engine flags specific suspicious patterns (incomple
 5. A heuristic risk-factor engine checks for known red flags in the raw features.
 6. Everything gets handed to the AI explanation layer, which writes a short analyst-style report — or falls back to a local template if no API key is set.
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Layer | Tools |
 |---|---|
@@ -50,7 +50,7 @@ On top of that, a rule-based engine flags specific suspicious patterns (incomple
 | Frontend | HTML/CSS/JS templates rendered by Flask |
 | Exploration / Training | Jupyter, matplotlib, seaborn |
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 Network-Intrusion-Detection-System/
@@ -66,7 +66,7 @@ Network-Intrusion-Detection-System/
 └── .gitignore
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -92,7 +92,7 @@ python app.py
 
 Then open **http://127.0.0.1:5000** in your browser.
 
-## 🔑 Environment Variables (optional)
+## Environment Variables (optional)
 
 The app runs fully offline out of the box. If you'd like AI-generated SOC reports instead of the local rule-based ones, set one of the following before starting the app:
 
@@ -103,7 +103,7 @@ The app runs fully offline out of the box. If you'd like AI-generated SOC report
 
 You can also paste a Gemini key directly into the web UI — it's only used for that request and isn't required to run the app.
 
-## 🔌 API Reference
+## API Reference
 
 | Method | Route | Description |
 |---|---|---|
@@ -114,14 +114,14 @@ You can also paste a Gemini key directly into the web UI — it's only used for 
 | `GET`/`POST` | `/api/random_sample` | Pulls a random row from the held-out test set and compares the prediction to ground truth |
 | `POST` | `/api/ai_chat` | Follow-up Q&A with the AI SOC analyst about the current traffic context |
 
-## 🧠 Model Details
+##  Model Details
 
 - Each of the three models is a **binary classifier** — it predicts `normal` vs. `attack`, along with a confidence/probability score.
 - The feature set is the classic ~41-column network-flow schema (duration, protocol, service, flag, byte counts, login stats, error rates, host-based aggregates, and so on) familiar from NSL-KDD/KDD-Cup-style intrusion datasets.
 - The consensus verdict is `attack` when at least 2 of 3 models agree; the threat score is the average attack probability across all three.
 - Specific attack sub-types (DoS, Probe, R2L, U2R) and named techniques (SYN flood, port scan, brute force, etc.) come from the risk-factor heuristics and the AI explanation layer — the classifiers themselves only decide normal vs. attack.
 
-## 🗺️ Ideas for Contributors
+## Ideas for Contributors
 
 A few directions this project could grow in, if you're looking for something to build:
 
@@ -130,7 +130,7 @@ A few directions this project could grow in, if you're looking for something to 
 - [ ] A model-comparison view (accuracy, precision, recall, ROC curves)
 - [ ] A `Dockerfile` for one-command deployment
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome and appreciated. If you'd like to help out:
 
