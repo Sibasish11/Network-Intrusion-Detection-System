@@ -17,8 +17,8 @@ Network Intrusion Detection Systems monitor network traffic for signs of unautho
 ## Tech Stack
 
 - **Language:** Python
-- **Libraries:** NumPy, Pandas, Scikit-learn (update with the libraries you actually used)
-- **Dataset:** NSL-KDD / CICIDS2017 / UNSW-NB15 (update with the dataset you used)
+- **Libraries:** NumPy, Pandas, Scikit-learn
+- **Dataset:** NSL-KDD / CICIDS2017 / UNSW-NB15 
 
 ## Project Structure
 
