@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-cli.py
-------
-NIDS Terminal Cyber Console AI Network Intrusion Detection System.
-Provides a full-featured, rich interactive terminal interface and CLI subcommands
-for real-time packet inspection, multi-model ML consensus, attack simulation,
-SOC incident response reasoning, and model evaluation.
-"""
 
 import os
 import sys
