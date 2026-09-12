@@ -89,10 +89,6 @@ Briefly describe the algorithm(s) used (e.g. Random Forest, SVM, Decision Tree, 
 - Web-based dashboard for monitoring alerts
 - Support for additional datasets and attack types
 
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
 ## Author
 
 **Sibasish11**
