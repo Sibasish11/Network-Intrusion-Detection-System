@@ -70,7 +70,7 @@ Network-Intrusion-Detection-System/
 
 ## Model / Approach
 
-Briefly describe the algorithm(s) used (e.g. Random Forest, SVM, Decision Tree, Neural Network), the preprocessing steps (encoding, scaling, feature selection), and the classification setup (binary vs. multi-class).
+Briefly describe the algorithm(s) used (e.g. Random Forest, SVM, Decision Tree, Neural Network), the preprocessing steps (encoding, scaling, feature selection), and the classification setup (binary vs. multi class).
 
 ## Results
 
