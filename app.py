@@ -1,10 +1,3 @@
-"""
-app.py
-------
-Flask Web Application for NIDS Console (Dual Web & Terminal Support).
-Leverages the centralized NIDSEngine for inference, risk telemetry, and AI reasoning.
-"""
-
 import os
 import warnings
 warnings.filterwarnings("ignore")
