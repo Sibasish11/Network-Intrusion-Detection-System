@@ -15,7 +15,6 @@ COLUMN_NAMES = [
     "dst_host_rerror_rate", "dst_host_srv_rerror_rate", "label", "difficulty_level"
 ]
 
-# Categorical columns that are text, not numbers (models need numbers)
 CATEGORICAL_COLS = ["protocol_type", "service", "flag"]
 
 
