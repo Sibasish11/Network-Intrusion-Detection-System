@@ -12,7 +12,6 @@ Network Intrusion Detection Systems monitor network traffic for signs of unautho
 - Detects multiple attack categories (e.g. DoS, Probe, R2L, U2R)
 - Data preprocessing and feature engineering pipeline
 - Trained and evaluated machine learning model(s)
-- Easy to extend with new datasets or models
 
 ## Tech Stack
 
