@@ -1,12 +1,3 @@
-"""
-preprocess.py
---------------
-Loads the raw NSL-KDD text files and turns them into clean, numeric,
-model-ready data. Run this file directly to test it:
-
-    python src/preprocess.py
-"""
-
 import os
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
