@@ -31,8 +31,6 @@ def train_all(data_dir="data"):
     print("Loading and preprocessing data...")
     X_train, y_train, X_test, y_test, artifacts = preprocess_pipeline(data_dir)
 
-    # Save the preprocessing artifacts (scaler + encoders) so app.py can
-    # transform new/incoming data the exact same way the training data was.
     joblib.dump(artifacts, os.path.join(MODELS_DIR, "artifacts.joblib"))
 
     # Also save an UNSCALED copy of the test features, purely so the demo
