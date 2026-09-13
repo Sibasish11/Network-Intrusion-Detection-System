@@ -2,6 +2,7 @@ import os
 import warnings
 warnings.filterwarnings("ignore")
 from flask import Flask, render_template, request, jsonify
+import pandas as pd
 
 from src.engine import (
     get_engine, PRESETS, DISPLAY_COLS,
