@@ -1,11 +1,3 @@
-"""
-src/engine.py
--------------
-Unified Core Engine for NIDS (Network Intrusion Detection System).
-Provides multi-model inference, heuristic threat analysis, attack presets,
-test data sampling, model evaluation, firewall rule generation, and AI SOC reasoning.
-"""
-
 import os
 import json
 import random
