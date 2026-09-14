@@ -10,7 +10,7 @@ from sklearn.metrics import (
 )
 
 MODELS_DIR = "models"
-RESULTS_DIR = "static"  # so the Flask app can also show these images
+RESULTS_DIR = "static"
 
 MODEL_NAMES = ["decision_tree", "random_forest", "naive_bayes"]
 
