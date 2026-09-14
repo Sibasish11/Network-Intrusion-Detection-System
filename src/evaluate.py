@@ -1,7 +1,7 @@
 import os
 import joblib
 import matplotlib
-matplotlib.use("Agg")  # so it works without a display, just saves images
+matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import (
