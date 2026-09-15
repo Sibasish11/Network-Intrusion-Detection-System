@@ -27,7 +27,6 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-# Rich Terminal UI components
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
