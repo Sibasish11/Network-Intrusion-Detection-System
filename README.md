@@ -14,8 +14,6 @@ Network Intrusion Detection Systems monitor network traffic for signs of unautho
 - Trained and evaluated machine learning model(s)
 
 ## Tech Stack
-
-- **Language:** Python
 - **Libraries:** NumPy, Pandas, Scikit-learn
 - **Dataset:** NSL-KDD / CICIDS2017 / UNSW-NB15 
 
