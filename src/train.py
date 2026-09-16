@@ -10,14 +10,7 @@ MODELS_DIR = "models"
 
 
 def get_models():
-    """
-    Defines the 3 models with reasonable beginner-friendly settings.
 
-    - max_depth on the tree stops it from growing too complex and
-      memorizing the training data (overfitting).
-    - n_estimators=100 for the forest means 100 trees vote together.
-    - random_state=42 makes results reproducible every time you run it.
-    """
     return {
         "decision_tree": DecisionTreeClassifier(max_depth=10, random_state=42),
         "random_forest": RandomForestClassifier(n_estimators=100, max_depth=15, random_state=42, n_jobs=-1),
