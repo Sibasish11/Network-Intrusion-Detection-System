@@ -25,8 +25,7 @@ def load_everything():
 def evaluate_model(name, model, X_test, y_test):
     y_pred = model.predict(X_test)
 
-    # label encoding was: 0 = attack, 1 = normal (alphabetical order)
-    # we treat "attack" as the "positive" class we care about detecting
+    
     acc = accuracy_score(y_test, y_pred)
     prec = precision_score(y_test, y_pred, pos_label=0)
     rec = recall_score(y_test, y_pred, pos_label=0)
