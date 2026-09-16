@@ -17,7 +17,6 @@ COLUMN_NAMES = [
 
 CATEGORICAL_COLS = ["protocol_type", "service", "flag"]
 
-
 def load_raw_data(data_dir="data"):
     """
     STEP 1: Load the raw text files into pandas DataFrames.
