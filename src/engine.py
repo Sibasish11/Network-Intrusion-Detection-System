@@ -524,7 +524,6 @@ class NIDSEngine:
                 except (ValueError, TypeError):
                     complete_row[cat_col] = 0
 
-        # Numeric casting
         for col in self.feature_cols:
             try:
                 complete_row[col] = float(complete_row[col])
