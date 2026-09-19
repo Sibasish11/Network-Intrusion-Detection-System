@@ -136,7 +136,6 @@ def display_telemetry_results(result, raw_features, ground_truth=None, ai_text=N
                 val_str = str(val)
             feat_table.add_row(k, val_str)
 
-    # Right: Multi-Model Vote Table
     model_table = Table(title="[bold cyan]Machine Learning Predictions[/bold cyan]", box=box.ROUNDED, show_header=True)
     model_table.add_column("Model", style="cyan")
     model_table.add_column("Verdict", justify="center")
